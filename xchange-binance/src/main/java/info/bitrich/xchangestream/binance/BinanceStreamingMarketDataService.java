@@ -283,6 +283,7 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
                 // normally have u == lastUpdateId + 1 which is stricter version of the above - let's be more relaxed
                 // each update has absolute numbers so even if there's an overlap it does no harm
                 .filter(depth -> {
+                	LOG.info("Orderbook snapshot for {} out of date (first={}, last={})", depth.getFirstUpdateId(), depth.getLastUpdateId());
                     long lastUpdateId = subscription.lastUpdateId.get();
                     boolean result;
                     if (lastUpdateId == 0L) {
