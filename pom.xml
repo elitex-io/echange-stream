@@ -5,7 +5,7 @@
     <groupId>info.bitrich.xchange-stream</groupId>
     <artifactId>xchange-stream-parent</artifactId>
     <packaging>pom</packaging>
-    <version>4.3.16</version>
+    <version>4.3.16e-SNAPSHOT</version>
 
     <modules>
         <module>xchange-stream-core</module>
@@ -60,6 +60,20 @@
     </scm>
 
     <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <name>Nexus Release Repository</name>
+            <url>http://maven.elitex.io/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>http://maven.elitex.io/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+    
+	<!-- 
+    <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -71,13 +85,13 @@
     </distributionManagement>
 
     <repositories>
-        <!-- For XChange SNAPSHOT dependency -->
         <repository>
             <id>sonatype-oss-snapshot</id>
             <snapshots />
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
     </repositories>
+     -->
 
     <properties>
         <xchange.version>4.3.19</xchange.version>
