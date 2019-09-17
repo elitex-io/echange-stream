@@ -333,7 +333,7 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
     
     private Observable<OrderBook> orderBookStream(CurrencyPair currencyPair) {
     	OrderbookSubscription subscription = orderbooks.get(currencyPair);
-    	return orderBookUpdateStream(currencyPair).map(u->{
+    	return getOrderBookUpdateList(currencyPair).map(u->{
     		return subscription.orderBook;
     	});
     }
