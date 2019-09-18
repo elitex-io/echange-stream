@@ -329,7 +329,9 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
                 	});
                 	
                 	return list;
-                }).startWith(orderBook2UpdateList(subscription.orderBook));
+                }).flatMap(mapper->Observable.just(orderBook2UpdateList(subscription.orderBook))
+                );
+//        .startWith(orderBook2UpdateList(subscription.orderBook));
     }
     
     private static List<OrderBookUpdate> orderBook2UpdateList(OrderBook orderBook) {
