@@ -250,6 +250,7 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
             }
             lastSyncTime.set(now);
         }
+        
     }
 
     private OrderbookSubscription connectOrderBook(CurrencyPair currencyPair) {
@@ -265,7 +266,7 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
         return subscription;
     }
         
-    private Observable<List<OrderBookUpdate>> orderBookUpdateStream(CurrencyPair currencyPair) {
+    private Observable<List<OrderBookUpdate>> orderBookUpdateStream(CurrencyPair currencyPair, Object... args) {
     	OrderbookSubscription subscription = orderbooks.computeIfAbsent(currencyPair, this::connectOrderBook);
         return subscription.stream
 
@@ -286,7 +287,6 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
                 // each update has absolute numbers so even if there's an overlap it does no harm
                 .filter(depth -> {
                     long lastUpdateId = subscription.lastUpdateId.get();
-                    LOG.info("Orderbook snapshot for {} out of date (last={}, U={}, u={}, s={}). This is normal. Re-syncing.", currencyPair, lastUpdateId, depth.getFirstUpdateId(), depth.getLastUpdateId(), subscription.snapshotlastUpdateId);
                     boolean result;
                     if (lastUpdateId == 0L) {
                         result = true;
@@ -329,17 +329,30 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
                 	});
                 	
                 	return list;
-                }).doOnSubscribe(new Consumer<Disposable>() {
-
-					@Override
-					public void accept(Disposable t) throws Exception {
-						
-					}
-				});
-//                .doOnSubscribe(depth ->{
-//                	List<OrderBookUpdate> list = new ArrayList<>(subscription.orderBook.getAsks().size()+subscription.orderBook.getBids().size());
-//                	return list;
-//                });
+                }).startWith(orderBook2UpdateList(subscription.orderBook));
+    }
+    
+    private static List<OrderBookUpdate> orderBook2UpdateList(OrderBook orderBook) {
+    	List<OrderBookUpdate> list= new ArrayList<>(orderBook.getAsks().size()+orderBook.getBids().size());
+    	orderBook.getAsks().forEach(o->{
+    		list.add(new OrderBookUpdate(
+    				o.getType(), 
+    				null,
+    				o.getCurrencyPair(),
+    				o.getLimitPrice(),
+    				o.getTimestamp(),
+    				o.getOriginalAmount()));
+    	});
+    	orderBook.getBids().forEach(o->{
+    		list.add(new OrderBookUpdate(
+    				o.getType(), 
+    				null,
+    				o.getCurrencyPair(),
+    				o.getLimitPrice(),
+    				o.getTimestamp(),
+    				o.getOriginalAmount()));
+    	});
+    	return list;
     }
     
     
