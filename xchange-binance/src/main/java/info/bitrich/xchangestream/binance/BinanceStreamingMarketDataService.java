@@ -136,6 +136,7 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
         return getUserTrades().filter(t -> t.getCurrencyPair().equals(currencyPair));
     }
     
+    @Override
     public Observable<List<OrderBookUpdate>> getOrderBookUpdateList(CurrencyPair currencyPair, Object... args) {
     	if (!service.getProductSubscription().getOrderBook().contains(currencyPair)) {
             throw new UnsupportedOperationException("Binance exchange only supports up front subscriptions - subscribe at connect time");
@@ -143,6 +144,7 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
         return orderbookUpdateSubscriptions.get(currencyPair);
 	}
     
+    @Override
     public Observable<OrderBookUpdate> getOrderBookUpdate(CurrencyPair currencyPair, Object... args) {
     	if (!service.getProductSubscription().getOrderBook().contains(currencyPair)) {
             throw new UnsupportedOperationException("Binance exchange only supports up front subscriptions - subscribe at connect time");
@@ -284,6 +286,7 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
                 // each update has absolute numbers so even if there's an overlap it does no harm
                 .filter(depth -> {
                     long lastUpdateId = subscription.lastUpdateId.get();
+                    LOG.info("Orderbook snapshot for {} out of date (last={}, U={}, u={}, s={}). This is normal. Re-syncing.", currencyPair, lastUpdateId, depth.getFirstUpdateId(), depth.getLastUpdateId(), subscription.snapshotlastUpdateId);
                     boolean result;
                     if (lastUpdateId == 0L) {
                         result = true;
@@ -326,7 +329,17 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
                 	});
                 	
                 	return list;
-                });  
+                }).doOnSubscribe(new Consumer<Disposable>() {
+
+					@Override
+					public void accept(Disposable t) throws Exception {
+						
+					}
+				});
+//                .doOnSubscribe(depth ->{
+//                	List<OrderBookUpdate> list = new ArrayList<>(subscription.orderBook.getAsks().size()+subscription.orderBook.getBids().size());
+//                	return list;
+//                });
     }
     
     
