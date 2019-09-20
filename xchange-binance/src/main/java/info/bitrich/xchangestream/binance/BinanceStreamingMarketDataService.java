@@ -311,7 +311,6 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
                     return result;
                 }).map(depth -> {
                 	BinanceOrderbook ob = depth.getOrderBook();
-                	LOG.info("{}",ob.asks.size() + ob.bids.size());
                 	List<OrderBookUpdate> list = new ArrayList<>(ob.asks.size() + ob.bids.size());
                 	ob.bids.forEach((key, value) -> list.add(new OrderBookUpdate(
                 			OrderType.BID,
