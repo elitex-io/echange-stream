@@ -176,11 +176,13 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
                 .forEach(currencyPair ->
                         tickerSubscriptions.put(currencyPair, triggerObservableBody(rawTickerStream(currencyPair).share())));
         productSubscription.getOrderBook()
-		        .forEach(currencyPair ->
-		                orderbookUpdateSubscriptions.put(currencyPair, triggerObservableBody(orderBookUpdateStream(currencyPair).share())));
-        productSubscription.getOrderBook()
-                .forEach(currencyPair ->
-                        orderbookSubscriptions.put(currencyPair, triggerObservableBody(orderBookStream(currencyPair).share())));
+		        .forEach(currencyPair -> {
+	                orderbookUpdateSubscriptions.put(currencyPair, triggerObservableBody(orderBookUpdateStream(currencyPair).share()));
+    				orderbookSubscriptions.put(currencyPair, triggerObservableBody(orderBookStream(currencyPair).share()));
+		        });
+//        productSubscription.getOrderBook()
+//                .forEach(currencyPair ->
+//                        orderbookSubscriptions.put(currencyPair, triggerObservableBody(orderBookStream(currencyPair).share())));
         productSubscription.getTrades()
                 .forEach(currencyPair ->
                         tradeSubscriptions.put(currencyPair, triggerObservableBody(rawTradeStream(currencyPair).share())));
@@ -309,6 +311,7 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
                     return result;
                 }).map(depth -> {
                 	BinanceOrderbook ob = depth.getOrderBook();
+                	LOG.info("{}",ob.asks.size() + ob.bids.size());
                 	List<OrderBookUpdate> list = new ArrayList<>(ob.asks.size() + ob.bids.size());
                 	ob.bids.forEach((key, value) -> list.add(new OrderBookUpdate(
                 			OrderType.BID,
@@ -327,14 +330,12 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
                 	list.forEach(u->{
                 		subscription.orderBook.update(u);
                 	});
-                	
                 	return list;
-                }).flatMap(mapper->Observable.just(orderBook2UpdateList(subscription.orderBook))
-                );
+                });
 //        .startWith(orderBook2UpdateList(subscription.orderBook));
     }
     
-    private static List<OrderBookUpdate> orderBook2UpdateList(OrderBook orderBook) {
+    public List<OrderBookUpdate> orderBook2UpdateList(OrderBook orderBook) {
     	List<OrderBookUpdate> list= new ArrayList<>(orderBook.getAsks().size()+orderBook.getBids().size());
     	orderBook.getAsks().forEach(o->{
     		list.add(new OrderBookUpdate(
