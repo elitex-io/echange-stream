@@ -8,7 +8,7 @@ import io.reactivex.Observable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.knowm.xchange.ExchangeSpecification;
-import org.knowm.xchange.bitfinex.v1.BitfinexExchange;
+import org.knowm.xchange.bitfinex.BitfinexExchange;
 
 /**
  * Created by Lukas Zaoralek on 7.11.17.
@@ -19,12 +19,16 @@ public class BitfinexStreamingExchange extends BitfinexExchange implements Strea
 
     private BitfinexStreamingService streamingService;
     private BitfinexStreamingMarketDataService streamingMarketDataService;
+    private BitfinexStreamingTradeService streamingTradeService;
+    private BitfinexStreamingAccountService streamingAccountService;
 
     @Override
     protected void initServices() {
         super.initServices();
         this.streamingService = createStreamingService();
         this.streamingMarketDataService = new BitfinexStreamingMarketDataService(streamingService);
+        this.streamingTradeService = new BitfinexStreamingTradeService(streamingService);
+        this.streamingAccountService = new BitfinexStreamingAccountService(streamingService);
     }
 
     private BitfinexStreamingService createStreamingService() {
@@ -73,6 +77,16 @@ public class BitfinexStreamingExchange extends BitfinexExchange implements Strea
     @Override
     public BitfinexStreamingMarketDataService getStreamingMarketDataService() {
         return streamingMarketDataService;
+    }
+
+    @Override
+    public BitfinexStreamingAccountService getStreamingAccountService() {
+        return streamingAccountService;
+    }
+
+    @Override
+    public BitfinexStreamingTradeService getStreamingTradeService() {
+        return streamingTradeService;
     }
 
     @Override
