@@ -119,7 +119,7 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
                 new Date(rawTrade.getTimestamp()),
                 String.valueOf(rawTrade.getTradeId())
             ));
-//<<<<<<< HEAD
+    }
 //        if (binanceUserDataStreamingService != null) {
 //            return publicTrades.mergeWith(getUserTrades(currencyPair, args));
 //        } else {
@@ -137,30 +137,30 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
 //        return getUserTrades().filter(t -> t.getCurrencyPair().equals(currencyPair));
 //    }
 //    
-//    @Override
-//    public Observable<List<OrderBookUpdate>> getOrderBookUpdateList(CurrencyPair currencyPair, Object... args) {
-//    	if (!service.getProductSubscription().getOrderBook().contains(currencyPair)) {
-//            throw new UnsupportedOperationException("Binance exchange only supports up front subscriptions - subscribe at connect time");
-//        }
-//        return orderbookUpdateSubscriptions.get(currencyPair);
-//	}
-//    
-//    @Override
-//    public Observable<OrderBookUpdate> getOrderBookUpdate(CurrencyPair currencyPair, Object... args) {
-//    	if (!service.getProductSubscription().getOrderBook().contains(currencyPair)) {
-//            throw new UnsupportedOperationException("Binance exchange only supports up front subscriptions - subscribe at connect time");
-//        }
-//        return orderbookUpdateSubscriptions.get(currencyPair).flatMap(l -> {
-//        	return Observable.fromIterable(l);
-//        });
-//	}
+	@Override
+	public Observable<List<OrderBookUpdate>> getOrderBookUpdateList(CurrencyPair currencyPair, Object... args) {
+		if (!service.getProductSubscription().getOrderBook().contains(currencyPair)) {
+			throw new UnsupportedOperationException(
+					"Binance exchange only supports up front subscriptions - subscribe at connect time");
+		}
+		return orderbookUpdateSubscriptions.get(currencyPair);
+	}
+
+	@Override
+	public Observable<OrderBookUpdate> getOrderBookUpdate(CurrencyPair currencyPair, Object... args) {
+		if (!service.getProductSubscription().getOrderBook().contains(currencyPair)) {
+			throw new UnsupportedOperationException(
+					"Binance exchange only supports up front subscriptions - subscribe at connect time");
+		}
+		return orderbookUpdateSubscriptions.get(currencyPair).flatMap(l -> {
+			return Observable.fromIterable(l);
+		});
+	}
 //
 //    private Observable<ExecutionReportBinanceUserTransaction> rawExecutionReports() {
 //        return binanceUserDataStreamingService
 //            .subscribeChannel(BaseBinanceWebSocketTransaction.BinanceWebSocketTypes.EXECUTION_REPORT)
 //            .map((JsonNode s) -> executionReport(s.toString()));
-//>>>>>>> refs/tags/xchange-stream-parent-4.4.0
-    }
 
     private static String channelFromCurrency(CurrencyPair currencyPair, String subscriptionType) {
         String currency = String.join("", currencyPair.toString().split("/")).toLowerCase();
