@@ -83,21 +83,21 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
     @Override
     public Observable<OrderBook> getOrderBook(CurrencyPair currencyPair, Object... args) {
         if (!service.getProductSubscription().getOrderBook().contains(currencyPair)) {
-            throw new UnsupportedOperationException("Binance exchange only supports up front subscriptions - subscribe at connect time");
+            throw new UnsupportedOperationException("Binance exchange only supports up front subscriptions - subscribe at connect time - " + currencyPair);
         }
         return orderbookSubscriptions.get(currencyPair);
     }
 
     public Observable<BinanceTicker24h> getRawTicker(CurrencyPair currencyPair, Object... args) {
         if (!service.getProductSubscription().getTicker().contains(currencyPair)) {
-            throw new UnsupportedOperationException("Binance exchange only supports up front subscriptions - subscribe at connect time");
+            throw new UnsupportedOperationException("Binance exchange only supports up front subscriptions - subscribe at connect time - " + currencyPair);
         }
         return tickerSubscriptions.get(currencyPair);
     }
 
     public Observable<BinanceRawTrade> getRawTrades(CurrencyPair currencyPair, Object... args) {
         if (!service.getProductSubscription().getTrades().contains(currencyPair)) {
-            throw new UnsupportedOperationException("Binance exchange only supports up front subscriptions - subscribe at connect time");
+            throw new UnsupportedOperationException("Binance exchange only supports up front subscriptions - subscribe at connect time - " + currencyPair);
         }
         return tradeSubscriptions.get(currencyPair);
     }
@@ -259,16 +259,8 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
         // 1. Open a stream to wss://stream.binance.com:9443/ws/bnbbtc@depth
         // 2. Buffer the events you receive from the stream.
         subscription.stream = service.subscribeChannel(channelFromCurrency(currencyPair, "depth"))
-//<<<<<<< HEAD
-//                .map((JsonNode s) -> depthTransaction(s.toString()))
-//                .filter(transaction ->
-//                        transaction.getData().getCurrencyPair().equals(currencyPair) &&
-//                                transaction.getData().getEventType() == DEPTH_UPDATE);
-//
-//=======
                 .map(this::depthTransaction)
                 .filter(transaction -> transaction.getData().getCurrencyPair().equals(currencyPair));
-//>>>>>>> refs/tags/xchange-stream-parent-4.4.0
         return subscription;
     }
         
